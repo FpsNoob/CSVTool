@@ -1,6 +1,6 @@
 import os
 import pandas as pd
-import csv
+import numpy as np
 import datetime
 import re
 from tensorflow.python.platform import gfile
@@ -114,12 +114,97 @@ def loadSubjectName():
         subject_list.append(i)
     return subject_list
 
-
-def dupilication():
+def str_deal(str1, str2, str3): # 处理知识点是否为空，是否是string类型，是否在all_point里已经存在
     '''
-    jfkfh sk
+
+    :param str1:
+    :param str2:
+    :param str3:
     :return:
     '''
+
+
+
+def duplication(filepath):
+    duplicate = []
+    r = '[a-zA-Z0-9’.!"#$%&\'()*+,-./:；;<=>?@[\\]^_`{|}~\n。！，]'
+    df = pd.read_csv(filepath, encoding='utf-8')
+    for stem in df['stem_search']:
+        stem = stem.replace(" ", "")
+        stem = re.sub(r, '', stem)
+        duplicate.append(stem)
+        #print(stem)
+    df['duplicate'] = duplicate
+    data_len = len(df['duplicate'])
+    point = []
+    for i in range(data_len):
+        print(i)
+        stem_base = df['duplicate'][i]
+        all_point = ''
+        for j in range(data_len):
+            print(j)
+            p1 = p2 = p3 = " "
+            p1 = df['points'][j]
+            p2 = df['points_2'][j]
+            p3 = df['points_3'][j]
+            if df['duplicate'][j] == stem_base:
+                if pd.isnull(p1):
+                    p1 = ""
+                else:
+                    if type(p1)==type("str"):
+                        p1 = p1
+                    else:
+                        p1 = str(p1)
+                if pd.isnull(p2):
+                    p2 = ""
+                else:
+                    if type(p2)==type("str"):
+                        p2 = p2
+                    else:
+                        p2 = str(p2)
+                if pd.isnull(p3):
+                    p3 = ""
+                else:
+                    if type(p3)== type("str"):
+                        p3 = p3
+                    else:
+                        p3 = str(p3)
+                if all_point.find(p1) < 0:
+                    all_point += p1+','
+                if all_point.find(p2) < 0:
+                    all_point += p2+','
+                if all_point.find(p3) < 0:
+                    all_point += p3+','
+                all_point.replace('、', ',')     # 将知识点中的顿号分隔符改成逗号
+        point.append(all_point)
+    print(len(point))
+    df['point'] = point
+    df = df.drop_duplicates(subset=['duplicate'], keep='first', inplace=False)
+    df.to_csv('./test_duplicate.csv', columns=['point','stem_search','duplicate','stem_html'],
+              encoding='utf-8', index=0)
+    # df = pd.read_csv('./test_duplicate.csv', encoding='utf-8')
+    # data_len = len(df['point'])
+    # points = []
+    # question = []
+    # question_html = []
+    # for i in range(data_len):
+    #     str = df['point'][i]
+    #     print(str)
+    #     str = str.split(',')
+    #     for x in str:
+    #         if x != ' ':
+    #             points.append(x)
+    #             question.append(df['stem_search'][i])
+    #             question_html.append(df['stem_html'][i])
+    # df['point_123'] = points
+    # df['question'] = question
+    # df['question_html'] = question_html
+    # df.to_csv('./test_final.csv', columns=['point_123','question','question_html'],
+    #           encoding='utf-8', index=0)
+
+
+        
+
 
 
 if __name__ == '__main__':
@@ -131,4 +216,7 @@ if __name__ == '__main__':
     # filter_data(path, '*.csv')
     # subjectList = combine(path, '*.csv')
     # saveSubjectName(subjectList)
-    final(path)
+    #final(path)
+    duplication(r'./高中物理.csv')
+# df = df.dropna(axis=0, subset=['points','points_2','points_3'], how='any', inplace=False)
+#     df.to_csv('./test_blank.csv', encoding='utf-8', index=0)
