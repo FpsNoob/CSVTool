@@ -20,6 +20,8 @@ def questionPrepos(filePath):
         my_dict[set_index].append({'question': question})  # 添加value，point所对应的题目
 
 
+
+
 if __name__ == "__main__":
     filePath = r'./高中物理.csv'
     questionPrepos(filePath)

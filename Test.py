@@ -172,38 +172,38 @@ def duplication(filepath, name):
     df['point'] = point
     print('-----------------------')
     print(len(df['point']))
-    df = df.drop_duplicates(subset='duplicate', keep='first', inplace=False)
+    df = df.drop_duplicates(subset='duplicate', keep='first', inplace=False)  # 保存中间数据，以免出现bug后。。。
     data_len = len(df['point'])
-    df.to_csv('./test_'+name, columns=['point', 'stem_search', 'stem_html'],
+    df.to_csv('./'+name, columns=['point', 'stem_search', 'stem_html'],
               encoding='utf-8', index=0)
-    # df = pd.read_csv('./test_'+name, encoding='utf-8')
-    # points = []
-    # question = []
-    # data_len = len(df['point'])
-    # question_html = []
-    # for i in range(data_len):
-    #     print(i)
-    #     str = df['point'][i]
-    #     if pd.isnull(str):
-    #         continue
-    #     else:
-    #         print(str)
-    #         str = str.split(',')
-    #         str = string_duplicate_4(str)
-    #         if str=='':
-    #             break
-    #         else:
-    #             for x in str:
-    #                 points.append(x)
-    #                 question.append(df['stem_search'][i])
-    #                 question_html.append(df['stem_html'][i])
-    # final_csv = []
-    # for i in range(len(points)):
-    #     t = (points[i], question[i], question_html[i])
-    #     final_csv.append(t)
-    # final_df = pd.DataFrame(final_csv, columns=['point_123','question','question_html'])
-    # final_df.drop_duplicates()
-    # final_df.to_csv('./'+name , encoding='utf-8', index=0)
+    df = pd.read_csv('./test_'+name, encoding='utf-8')
+    points = []
+    question = []
+    data_len = len(df['point'])
+    question_html = []
+    for i in range(data_len):
+        print(i)
+        str = df['point'][i]
+        if pd.isnull(str):
+            continue
+        else:
+            # print(str)
+            str = str.split(',')
+            str = string_duplicate_4(str)
+            if str=='':
+                break
+            else:
+                for x in str:
+                    points.append(x)
+                    question.append(df['stem_search'][i])
+                    question_html.append(df['stem_html'][i])
+    final_csv = []
+    for i in range(len(points)):
+        t = (points[i], question[i], question_html[i])
+        final_csv.append(t)
+    final_df = pd.DataFrame(final_csv, columns=['point_123','question','question_html'])
+    final_df.drop_duplicates()
+    final_df.to_csv('./'+name, encoding='utf-8', index=0)
 
 
 if __name__ == '__main__':
