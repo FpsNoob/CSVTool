@@ -14,10 +14,10 @@ def questionPrepos(filePath):
     df = pd.read_csv(filePath, encoding='utf-8')
     data_len = len(df['point_123'])
     my_dict = {df['point_123'][i]: [] for i in range(data_len)}  # 将所有的point作为key添加到字典中
-    for i in range(data_len):   # 添加value，point所对应的题目
+    for i in range(data_len):   # 遍历所有题目
         set_index = df['point_123'][i]
         question = df['question'][i]
-        my_dict[set_index].append({'question': question})
+        my_dict[set_index].append({'question': question})  # 添加value，point所对应的题目
 
 
 if __name__ == "__main__":
