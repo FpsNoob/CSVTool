@@ -114,22 +114,42 @@ def loadSubjectName():
         subject_list.append(i)
     return subject_list
 
-def str_deal(str1, str2, str3): # 处理知识点是否为空，是否是string类型，是否在all_point里已经存在
-    '''
-
-    :param str1:
-    :param str2:
-    :param str3:
-    :return:
-    '''
 
 
+def str_deal(str1, str2, str3, all_point):
+    str1 = jud(str1)
+    str2 = jud(str2)
+    str3 = jud(str3)
+    all_point += str1+str2+str3
+    all_point = re.sub(r'[、]', ',', all_point)
+    return all_point
 
-def duplication(filepath):
+
+
+def jud(p):
+    if pd.isnull(p):
+        p = ""
+    else:
+        if type(p) == type("str"):
+            p = p+','
+        else:
+            p = str(p)+','
+    return p
+
+def string_duplicate_4(s):
+    new_s = []
+    for x in s:
+        if x not in new_s:
+            if x!='':
+                new_s.append(x)
+    return new_s
+
+
+def duplication(filepath, name):
     duplicate = []
     r = '[a-zA-Z0-9’.!"#$%&\'()*+,-./:；;<=>?@[\\]^_`{|}~\n。！，]'
     df = pd.read_csv(filepath, encoding='utf-8')
-    for stem in df['stem_search']:
+    for stem in df['stem_search']:  # 将题目进行去标点符号字符等等，用于题目去重
         stem = stem.replace(" ", "")
         stem = re.sub(r, '', stem)
         duplicate.append(stem)
@@ -137,79 +157,60 @@ def duplication(filepath):
     df['duplicate'] = duplicate
     data_len = len(df['duplicate'])
     point = []
-    for i in range(data_len):
-        print(i)
+    for i in range(data_len):  # 将相同题目的知识点合并，使用逗号隔开知识点，存于point属性中
         stem_base = df['duplicate'][i]
-        all_point = ''
-        for j in range(data_len):
-            print(j)
-            p1 = p2 = p3 = " "
+        all_point = ""
+        for j in range(i, data_len, 1):
+            print('in %d : %d'%(i, j))
             p1 = df['points'][j]
             p2 = df['points_2'][j]
             p3 = df['points_3'][j]
             if df['duplicate'][j] == stem_base:
-                if pd.isnull(p1):
-                    p1 = ""
-                else:
-                    if type(p1)==type("str"):
-                        p1 = p1
-                    else:
-                        p1 = str(p1)
-                if pd.isnull(p2):
-                    p2 = ""
-                else:
-                    if type(p2)==type("str"):
-                        p2 = p2
-                    else:
-                        p2 = str(p2)
-                if pd.isnull(p3):
-                    p3 = ""
-                else:
-                    if type(p3)== type("str"):
-                        p3 = p3
-                    else:
-                        p3 = str(p3)
-                if all_point.find(p1) < 0:
-                    all_point += p1+','
-                if all_point.find(p2) < 0:
-                    all_point += p2+','
-                if all_point.find(p3) < 0:
-                    all_point += p3+','
-                all_point.replace('、', ',')     # 将知识点中的顿号分隔符改成逗号
+                all_point = str_deal(p1, p2, p3, all_point)
         point.append(all_point)
     print(len(point))
     df['point'] = point
-    df = df.drop_duplicates(subset=['duplicate'], keep='first', inplace=False)
-    df.to_csv('./test_duplicate.csv', columns=['point','stem_search','duplicate','stem_html'],
+    print('-----------------------')
+    print(len(df['point']))
+    df = df.drop_duplicates(subset='duplicate', keep='first', inplace=False)
+    data_len = len(df['point'])
+    df.to_csv('./test_'+name, columns=['point', 'stem_search', 'stem_html'],
               encoding='utf-8', index=0)
-    # df = pd.read_csv('./test_duplicate.csv', encoding='utf-8')
-    # data_len = len(df['point'])
+    # df = pd.read_csv('./test_'+name, encoding='utf-8')
     # points = []
     # question = []
+    # data_len = len(df['point'])
     # question_html = []
     # for i in range(data_len):
+    #     print(i)
     #     str = df['point'][i]
-    #     print(str)
-    #     str = str.split(',')
-    #     for x in str:
-    #         if x != ' ':
-    #             points.append(x)
-    #             question.append(df['stem_search'][i])
-    #             question_html.append(df['stem_html'][i])
-    # df['point_123'] = points
-    # df['question'] = question
-    # df['question_html'] = question_html
-    # df.to_csv('./test_final.csv', columns=['point_123','question','question_html'],
-    #           encoding='utf-8', index=0)
-
-
-        
-
+    #     if pd.isnull(str):
+    #         continue
+    #     else:
+    #         print(str)
+    #         str = str.split(',')
+    #         str = string_duplicate_4(str)
+    #         if str=='':
+    #             break
+    #         else:
+    #             for x in str:
+    #                 points.append(x)
+    #                 question.append(df['stem_search'][i])
+    #                 question_html.append(df['stem_html'][i])
+    # final_csv = []
+    # for i in range(len(points)):
+    #     t = (points[i], question[i], question_html[i])
+    #     final_csv.append(t)
+    # final_df = pd.DataFrame(final_csv, columns=['point_123','question','question_html'])
+    # final_df.drop_duplicates()
+    # final_df.to_csv('./'+name , encoding='utf-8', index=0)
 
 
 if __name__ == '__main__':
-    path = r'D:\WorkSpace\错题推荐\Data\csv_data'
-    fileName = 't_xbj_record0930'
+    path = 'D:\WorkSpace\错题推荐\Data\csv_data\高中学科'
+    fileName = '高中生物.csv'
+    file_path = os.path.join(path, fileName)
+    duplication(file_path, fileName)
     lines = 5000
     fileFormat = '*.csv'
     # slipt_data(path, file_name, lines)
@@ -217,6 +218,3 @@ if __name__ == '__main__':
     # subjectList = combine(path, '*.csv')
     # saveSubjectName(subjectList)
     #final(path)
-    duplication(r'./高中物理.csv')
-# df = df.dropna(axis=0, subset=['points','points_2','points_3'], how='any', inplace=False)
-#     df.to_csv('./test_blank.csv', encoding='utf-8', index=0)
