@@ -18,7 +18,7 @@ def questionPrepos(filePath):
         set_index = df['point_123'][i]
         question = df['question'][i]
         my_dict[set_index].append({'question': question})  # 添加value，point所对应的题目
-
+    return my_dict
 
 
 
