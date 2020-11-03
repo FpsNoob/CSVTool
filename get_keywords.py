@@ -1,28 +1,33 @@
-# 采用TF-IDF的方法提取题目中的关键字
-import sys
+# 使用词袋模型提取出文本关键字
 import pandas as pd
-import numpy as np
-import jieba.posseg
-import jieba.analyse
-from sklearn import feature_extraction
-from sklearn.feature_extraction.text import TfidfTransformer
-from sklearn.feature_extraction.text import CountVectorizer
+import codecs
+import train_bagmodel as td
+
+def extract(question, stop_key):
+    question = td.data_prepos(question[0], stop_key)
+    keywords = []
+    point = []
+    df = pd.read_csv("./result/point_keywords.csv", encoding='utf-8')
+    for i in range(len(df['keywords'])):
+        for j in question:
+            if j == df['keywords'][i] and j not in keywords:
+                keywords.append(j)
+                if df['point'][i] not in point:
+                    point.append(df['point'][i])
+    return keywords, point
 
 
-# 使用dict创建知识点和题目的映射关系
-def questionPrepos(filePath):
-    df = pd.read_csv(filePath, encoding='utf-8')
-    data_len = len(df['point_123'])
-    my_dict = {df['point_123'][i]: [] for i in range(data_len)}  # 将所有的point作为key添加到字典中
-    for i in range(data_len):   # 遍历所有题目
-        set_index = df['point_123'][i]
-        question = df['question'][i]
-        my_dict[set_index].append({'question': question})  # 添加value，point所对应的题目
-    return my_dict
+# def get_question(point):
 
 
 
-if __name__ == "__main__":
-    filePath = r'./高中物理.csv'
-    questionPrepos(filePath)
 
+
+if __name__ == '__main__':
+    stop_key = [w.strip() for w in codecs.open('./list/stopWord.txt', 'r', encoding='utf-8').readlines()]
+    f = open('question.txt', 'r',  encoding='utf-8')
+    question = f.readlines()
+    #print(question)
+    keywords, point = extract(question, stop_key)
+    print(keywords)
+    print(point)
